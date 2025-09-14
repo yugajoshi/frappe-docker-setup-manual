@@ -92,13 +92,25 @@ Remove lines related to Letsencrypt, store your certificates on VM and mount vol
 
 (More on this in later section).
 
-### Using External MariaDB
+### Using External MariaDB# Generate YAML
+docker compose -f compose.yaml \
+  -f overrides/compose.redis.yaml \
+  -f overrides/compose.https.yaml \
+  config > ~/gitops/docker-compose.yml
+
+# Start containers
+docker compose --project-name <project-name> -f ~/gitops/docker-compose.yml up -d
+```
 
 If you want to use external MariaDB (like MariaDB hosted on different VM or MariaDB on AWS RDS), then use DB_HOST variable in .env file.
 
 If different VM is being used for MariaDB, then mention Private IP of VM in DB_HOST variable and make sure to host your VM in private subnet to make it more secure.
 
 If AWS RDS is being used, then mention DB Endpoint from Cloud Console.
+To use AWS RDS for Frappe, create the Database on AWS with Mariadb Engine in the same VPC like your VM.
+To launch the containers use below command.(Command is same like above, only compose file for mariadb is skipped.)
+```bash
+
 
 ### Using Additional Apps
 
