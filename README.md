@@ -12,8 +12,9 @@ docker compose –f pwd.yml up
 After this you can pull other apps by accessing backend container using normal bench command. But if you want to make your additional apps part of docker image and want to launch backend container with all other apps along with Frappe and ERPNext, then follow below steps.
 Let's say, you want to build an image with Frappe HRMS, India Compliance, Payments app along with Frappe and ERPNext:
 ### Requirements:
-Ubuntu
+Ubuntu \
 Docker-Install it using official documentation
+
 ```bash
 git clone https://github.com/yugajoshi/frappe_docker.git
 cd frappe-docker
