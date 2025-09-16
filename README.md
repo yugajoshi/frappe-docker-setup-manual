@@ -7,7 +7,7 @@ git clone https://github.com/yugajoshi/frappe_docker.git
 cd frappe-docker
 docker compose –f pwd.yml up
 ```
-### Above command will create frappe site with only Frappe and ERPNext apps. If you are on local machine then access the site using localhost:8080 or 127.0.0.1:8080. If site is unreachable then you have to ensure 8080, 8000, 3306, 6679 ports are allowed on your local machine. If you are on cloud VM, then access the site using vm-ip:8080 and make sure to open the ports in security group.
+### Above command will create frappe site with only Frappe and ERPNext apps. If you are on local machine then access the site using localhost:8080 or 127.0.0.1:8080. If site is unreachable then you have to ensure 8080, 8000, 3306, 6379 ports are allowed on your local machine. If you are on cloud VM, then access the site using vm-ip:8080 and make sure to open the ports in security group.
 ### Option 1.1 Build an image with Custom Apps along with Frappe and ERPNext
 After this you can pull other apps by accessing backend container using normal bench command. But if you want to make your additional apps part of docker image and want to launch backend container with all other apps along with Frappe and ERPNext, then follow below steps.
 Let's say, you want to build an image with Frappe HRMS, India Compliance, Payments app along with Frappe and ERPNext:
