@@ -64,7 +64,7 @@ echo -n ${APPS_JSON_BASE64} | base64 -d > apps-test-output.json
 ```
 above command will generate apps-test-output.json in frappe-docker directory. Open this file and check whether it is same like apps.json or not.
 
-###Now to build the image from encoded apps.json file use below command:
+### Now to build the image from encoded apps.json file use below command:
 ```bash
 docker build \
   --build-arg=FRAPPE_PATH=https://github.com/frappe/frappe \
