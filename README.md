@@ -7,6 +7,98 @@ git clone https://github.com/yugajoshi/frappe_docker.git
 cd frappe-docker
 docker compose –f pwd.yml up
 ```
+### Above command will create frappe site with only Frappe and ERPNext apps. If you are on local machine then access the site using localhost:8080 or 127.0.0.1:8080. If site is unreachable then you have to ensure 8080, 8000, 3306, 6679 ports are allowed on your local machine. If you are on cloud VM, then access the site using vm-ip:8080 and make sure to open the ports in security group.
+### Option 1.1 Build an image with Custom Apps along with Frappe and ERPNext
+After this you can pull other apps by accessing backend container using normal bench command. But if you want to make your additional apps part of docker image and want to launch backend container with all other apps along with Frappe and ERPNext, then follow below steps.
+Let's say, you want to build an image with Frappe HRMS, India Compliance, Payments app along with Frappe and ERPNext:
+### Requirements:
+Ubuntu
+Docker-Install it using official documentation
+```bash
+git clone https://github.com/yugajoshi/frappe_docker.git
+cd frappe-docker
+vim apps.json
+```
+Paste below contents in apps.json
+```bash
+[
+  {
+    "url": "https://github.com/frappe/erpnext",
+    "branch": "version-15"
+  },
+  {
+    "url": "https://github.com/frappe/payments",
+    "branch": "version-15"
+  },
+  {
+    "url": "https://github.com/resilient-tech/india-compliance.git",
+    "branch": "version-15"
+  },
+  {
+    "url": "https://github.com/frappe/hrms.git",
+    "branch": "version-15"
+  },
+]
+```
+Along with these apps which are publicly available if you want to add your custom app which is on private repo then you need Personal Access Token(PAT) that is Token. PAT can be generated from GitHub account on which private repo is available.
+
+In addition to above code, use below syntax to add your custom app:
+```bash
+  {
+    "url": "https://{{ PAT }}@git.example.com/project/repository.git",
+    "branch": "main"
+  }
+```
+### Now Generate base64 string from apps.json file:
+```bash
+export APPS_JSON_BASE64=$(base64 -w 0 apps.json)
+```
+### Test the Previous Step: Decode the Base64-encoded Environment Variable
+
+To verify the previous step, decode the APPS_JSON_BASE64 environment variable (which is Base64-encoded) into a JSON file. Follow the steps below:
+
+### Use the following command to decode and save the output into a JSON file named apps-test-output.json:
+```bash
+echo -n ${APPS_JSON_BASE64} | base64 -d > apps-test-output.json
+```
+above command will generate apps-test-output.json in frappe-docker directory. Open this file and check whether it is same like apps.json or not.
+
+###Now to build the image from encoded apps.json file use below command:
+```bash
+docker build \
+  --build-arg=FRAPPE_PATH=https://github.com/frappe/frappe \
+  --build-arg=FRAPPE_BRANCH=version-15 \
+  --build-arg=APPS_JSON_BASE64=$APPS_JSON_BASE64 \
+  --tag=docker-hub-username/repo-name:1.0.0 \
+  --file=images/layered/Containerfile .
+```
+Above command considers DockerHub as your image registry, if you want to use other registry, change the tag accordingly.
+### This command will build the image. Check it using:
+```bash
+docker images
+```
+### (Optional)If you want to use different Python and Node versions, use below command, otherwise above command is sufficient.
+```bash
+docker build \
+  --build-arg=FRAPPE_PATH=https://github.com/frappe/frappe \
+  --build-arg=FRAPPE_BRANCH=version-15 \
+  --build-arg=PYTHON_VERSION=3.11.9 \
+  --build-arg=NODE_VERSION=20.19.2 \
+  --build-arg=APPS_JSON_BASE64=$APPS_JSON_BASE64 \
+  --tag=docker-hub-username/repo-name:1.0.0 \
+  --file=images/custom/Containerfile .
+```
+### Push image to use in yaml files
+### Login to docker
+```bash
+docker login -u dockerhub-username -p
+```
+### Push image
+```bash
+docker push docker-hub-username/repo-name:1.0.0
+```
+After pushing this image, you can use this image in pwd.yaml file by replacing existing image name with your image name (docker-hub-username/repo-name:1.0.0). Or you can use this image in production setup by adding CUSTOM_IMAGE=docker-hub-username/repo-name and CUSTOM_TAG=1.0.0 environment variables in .env file. This is explained in below section.
+
 ## Option 2: Production Setup
 ### Option 2.1: With Containerized Mariadb and Letsencrypt SSL Certificates.
 ```git clone https://github.com/yugajoshi/frappe_docker.git
